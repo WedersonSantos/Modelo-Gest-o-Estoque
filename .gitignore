@@ -10,3 +10,6 @@ playwright-report/
 *.tsbuildinfo
 next-env.d.ts
 .neon
+
+# Local Netlify folder
+.netlify
