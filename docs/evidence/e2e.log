@@ -8,4 +8,4 @@ Running 2 tests using 1 worker
   ok 1 [desktop] › tests\e2e\restaurant.spec.ts:2:1 › família completa o fluxo pela interface (4.7s)
   ok 2 [celular] › tests\e2e\restaurant.spec.ts:2:1 › família completa o fluxo pela interface (2.1s)
 
-  2 passed (8.3s)\n
+  2 passed (8.3s)

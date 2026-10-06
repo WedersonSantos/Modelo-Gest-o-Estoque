@@ -1,0 +1,285 @@
+[
+  {
+    "device": "desktop",
+    "page": "dashboard",
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "unlabeled": [],
+    "smallTargets": [
+      {
+        "text": "Sair",
+        "height": 36
+      },
+      {
+        "text": "Registrar movimentação",
+        "height": 42
+      },
+      {
+        "text": "Hoje",
+        "height": 34
+      },
+      {
+        "text": "7 dias",
+        "height": 34
+      },
+      {
+        "text": "Este mês",
+        "height": 34
+      },
+      {
+        "text": "Data inicial",
+        "height": 34
+      },
+      {
+        "text": "Data final",
+        "height": 34
+      },
+      {
+        "text": "Filtrar",
+        "height": 34
+      },
+      {
+        "text": "Ver lista",
+        "height": 19
+      },
+      {
+        "text": "Organizar compras",
+        "height": 34
+      },
+      {
+        "text": "Todos os pedidos",
+        "height": 19
+      },
+      {
+        "text": "Abrir",
+        "height": 19
+      },
+      {
+        "text": "Abrir",
+        "height": 19
+      }
+    ]
+  },
+  {
+    "device": "desktop",
+    "page": "estoque",
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "unlabeled": [],
+    "smallTargets": [
+      {
+        "text": "Sair",
+        "height": 36
+      },
+      {
+        "text": "Novo ingrediente",
+        "height": 42
+      },
+      {
+        "text": "Buscar ingredientes",
+        "height": 39
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      },
+      {
+        "text": "Editar",
+        "height": 19
+      }
+    ]
+  },
+  {
+    "device": "desktop",
+    "page": "cotacoes",
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "unlabeled": [],
+    "smallTargets": [
+      {
+        "text": "Sair",
+        "height": 36
+      },
+      {
+        "text": "Gerar lista do estoque mínimo",
+        "height": 34
+      },
+      {
+        "text": "Avaliar e escolher",
+        "height": 19
+      },
+      {
+        "text": "Avaliar e escolher",
+        "height": 19
+      },
+      {
+        "text": "Avaliar e escolher",
+        "height": 19
+      }
+    ]
+  },
+  {
+    "device": "desktop",
+    "page": "pedido",
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "unlabeled": [],
+    "smallTargets": [
+      {
+        "text": "Sair",
+        "height": 36
+      },
+      {
+        "text": "Gerar lista do estoque mínimo",
+        "height": 34
+      },
+      {
+        "text": "Cancelar pedido",
+        "height": 34
+      },
+      {
+        "text": "Receber Carne bovina",
+        "height": 42
+      },
+      {
+        "text": "Receber Azeite",
+        "height": 42
+      },
+      {
+        "text": "Confirmar recebimento",
+        "height": 42
+      }
+    ]
+  },
+  {
+    "device": "desktop",
+    "page": "financeiro",
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "unlabeled": [],
+    "smallTargets": [
+      {
+        "text": "Sair",
+        "height": 36
+      },
+      {
+        "text": "Marcar como pago",
+        "height": 34
+      },
+      {
+        "text": "reason",
+        "height": 42
+      },
+      {
+        "text": "Cancelar lançamento",
+        "height": 42
+      },
+      {
+        "text": "Marcar como pago",
+        "height": 34
+      },
+      {
+        "text": "reason",
+        "height": 42
+      },
+      {
+        "text": "Cancelar lançamento",
+        "height": 42
+      }
+    ]
+  },
+  {
+    "device": "desktop",
+    "page": "exportacao-csv",
+    "status": 200,
+    "lines": 10
+  },
+  {
+    "device": "desktop",
+    "page": "logout-and-anonymous",
+    "url": "http://127.0.0.1:3000/login",
+    "status": 200,
+    "errors": []
+  },
+  {
+    "device": "celular",
+    "page": "dashboard",
+    "viewport": 390,
+    "documentWidth": 390,
+    "unlabeled": [],
+    "smallTargets": []
+  },
+  {
+    "device": "celular",
+    "page": "estoque",
+    "viewport": 390,
+    "documentWidth": 390,
+    "unlabeled": [],
+    "smallTargets": []
+  },
+  {
+    "device": "celular",
+    "page": "cotacoes",
+    "viewport": 390,
+    "documentWidth": 390,
+    "unlabeled": [],
+    "smallTargets": []
+  },
+  {
+    "device": "celular",
+    "page": "pedido",
+    "viewport": 390,
+    "documentWidth": 390,
+    "unlabeled": [],
+    "smallTargets": []
+  },
+  {
+    "device": "celular",
+    "page": "financeiro",
+    "viewport": 390,
+    "documentWidth": 390,
+    "unlabeled": [],
+    "smallTargets": []
+  },
+  {
+    "device": "celular",
+    "page": "exportacao-csv",
+    "status": 200,
+    "lines": 10
+  },
+  {
+    "device": "celular",
+    "page": "logout-and-anonymous",
+    "url": "http://127.0.0.1:3000/login",
+    "status": 200,
+    "errors": []
+  }
+]

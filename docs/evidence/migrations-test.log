@@ -6,4 +6,4 @@ Datasource "db": PostgreSQL database "restaurante_test", schema "public" at "127
 1 migration found in prisma/migrations
 
 
-No pending migrations to apply.\n
+No pending migrations to apply.

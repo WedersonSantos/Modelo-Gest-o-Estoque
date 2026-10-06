@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.0.0 <25.0.0" },
+  "engines": {
+    "node": ">=24.0.0 <25.0.0"
+  },
   "allowScripts": {
     "@embedded-postgres/windows-x64": true,
     "@prisma/engines": true,
@@ -45,6 +47,8 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@neon/config": "^1.8.4",
+    "@neon/env": "^1.5.1",
     "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "^24.10.1",

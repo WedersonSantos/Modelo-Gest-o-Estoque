@@ -30,7 +30,9 @@ test("família completa o fluxo pela interface",async({page},testInfo)=>{
  await expect(page.getByRole("status")).toHaveText("Salvo com sucesso.");
  await page.goto("/compras/necessidades");
  await expect(page.getByRole("cell",{name:"12 kg",exact:true})).toBeVisible();
+ const listResponse=page.waitForResponse(r=>r.url().endsWith("/api/commands")&&r.request().postDataJSON()?.command==="generatePurchaseRequest");
  await page.getByRole("button",{name:"Gerar lista do estoque mínimo"}).click();
+ expect((await listResponse).ok()).toBeTruthy();
  await page.goto("/fornecedores/novo");
  await page.getByLabel("Nome do fornecedor").fill("Fornecedor da família");
  await page.getByRole("button",{name:"Cadastrar fornecedor",exact:true}).click();

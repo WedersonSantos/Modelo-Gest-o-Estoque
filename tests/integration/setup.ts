@@ -11,4 +11,4 @@ if (!process.env.TEST_DATABASE_URL) {
   }
   testUrl.pathname = "/restaurante_test";
 }
-process.env.DATABASE_URL = testUrl.toString();\n
+process.env.DATABASE_URL = testUrl.toString();

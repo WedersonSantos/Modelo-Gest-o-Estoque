@@ -33,3 +33,8 @@ O código usa o driver PostgreSQL padrão, sem SDK de provedor. O deploy requer 
 
 ## Operação
 Configure backups no provedor, teste restauração e monitore erros e conexões. Mantenha Node e dependências atualizados. Recuperação de senha por e-mail e convites estão no roadmap; na V1 o administrador cria os usuários na própria organização. Revogação de sessões ocorre no logout; sessões expiram em 7 dias e usuário inativo perde acesso imediatamente. Não há pagamentos externos ou automação bancária.
+
+
+## Atualização de 06/10/2026 — Neon
+
+O banco gerenciado Neon foi configurado e validado. Veja o [relatório de configuração Neon](neon-setup.md) com todas as alterações e resultados atuais.

@@ -1,0 +1,38 @@
+{
+  "project": "gentle-rice-38227588",
+  "branch": "production",
+  "branchId": "br-steep-mode-b66mxcyp",
+  "database": "neondb",
+  "applicationPooled": true,
+  "migrationDirect": true,
+  "tables": 24,
+  "migration": [
+    {
+      "migration_name": "202610050001_initial",
+      "applied": true,
+      "rolled_back": false
+    }
+  ],
+  "checks": 14,
+  "triggers": 7,
+  "demo": {
+    "products": 9,
+    "suppliers": 3,
+    "financial_entries": 6
+  },
+  "successfulUI": [
+    {
+      "name": "Restaurante teste UI 1791303314170",
+      "stock": "15.0000",
+      "amount": "240.00",
+      "status": "PAID"
+    },
+    {
+      "name": "Restaurante teste UI 1791303284566",
+      "stock": "15.0000",
+      "amount": "240.00",
+      "status": "PAID"
+    }
+  ],
+  "mismatchedLedgers": 0
+}

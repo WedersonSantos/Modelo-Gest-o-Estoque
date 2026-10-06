@@ -1,0 +1,16 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma\schema.prisma.
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-aged-shape-b6836uvy.c-2.sa-east-1.aws.neon.tech"
+
+1 migration found in prisma/migrations
+
+Applying migration `202610050001_initial`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 202610050001_initial/
+    └─ migration.sql
+
+All migrations have been successfully applied.

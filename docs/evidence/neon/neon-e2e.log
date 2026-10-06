@@ -1,0 +1,11 @@
+
+> restaurante-gestao@1.0.0 test:e2e
+> playwright test
+
+
+Running 2 tests using 1 worker
+
+  ok 1 [desktop] › tests\e2e\restaurant.spec.ts:2:1 › família completa o fluxo pela interface (29.0s)
+  ok 2 [celular] › tests\e2e\restaurant.spec.ts:2:1 › família completa o fluxo pela interface (31.9s)
+
+  2 passed (1.0m)

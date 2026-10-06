@@ -107,3 +107,7 @@ Esta entrega prepara e valida a aplicação localmente. Publicação em Vercel, 
 A V1 inclui autenticação e perfis, estoque, inventários, fornecedores e preços, listas de compra, cotações, aprovação, pedidos, recebimentos, financeiro gerencial, relatórios CSV e auditoria. Ela permite separar ingredientes em listas antes de cotar; a escolha de uma cotação exige atendimento integral de cada lista. Distribuir automaticamente uma mesma lista entre várias cotações permanece no roadmap.
 
 Os painéis recentes possuem limites de listagem; contas a pagar incluem todos os compromissos pendentes, e os agregados consideram os registros correspondentes completos. Paginação, recuperação de senha por e-mail, integrações externas, PDV, fiscal, ficha técnica e pagamentos bancários ficam para evolução. Frete compõe a despesa da compra, mas não o custo médio do ingrediente; condições textuais de pagamento não geram vencimentos automaticamente.
+
+## Atualização de 06/10/2026 — Neon
+
+O banco gerenciado Neon foi configurado e validado. Veja o [relatório de configuração Neon](neon-setup.md) com todas as alterações e resultados atuais.
