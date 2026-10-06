@@ -1,0 +1,23 @@
+
+> restaurante-gestao@1.0.0 test:integration
+> vitest run tests/integration --maxWorkers=1
+
+
+ RUN  v5.0.3 C:/Users/weder/OneDrive/Documentos/Arabe Vanessa/restaurante-gestao
+
+(node:11080) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+    at Client.query (C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\pg\lib\client.js:780:7)
+    at PgTransaction.performIO (file:///C:/Users/weder/OneDrive/Documentos/Arabe%20Vanessa/restaurante-gestao/node_modules/@prisma/adapter-pg/dist/index.mjs:645:40)
+    at PgTransaction.queryRaw (file:///C:/Users/weder/OneDrive/Documentos/Arabe%20Vanessa/restaurante-gestao/node_modules/@prisma/adapter-pg/dist/index.mjs:595:41)
+    at C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:70523
+    at Wr (C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:27324)
+    at e.#d (C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:76666)
+    at C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:70492
+    at e.#u (C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:75883)
+    at e.interpretNode (C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:70406)
+    at e.interpretNode (C:\Users\weder\OneDrive\Documentos\Arabe Vanessa\restaurante-gestao\node_modules\@prisma\client\runtime\client.js:11:69642)
+
+ Test Files  3 passed (3)
+      Tests  11 passed (11)
+   Start at  18:05:26
+   Duration  5.74s (tests 94%, import 5%, transform 1%)\n

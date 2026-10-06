@@ -1,0 +1,14 @@
+
+> restaurante-gestao@1.0.0 test:integration
+> vitest run tests/integration --maxWorkers=1
+
+
+ RUN  v5.0.3 C:/Users/weder/OneDrive/Documentos/Arabe Vanessa/restaurante-gestao
+
+(node:20432) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  3 passed (3)
+      Tests  11 passed (11)
+   Start at  18:32:08
+   Duration  6.49s (tests 93%, import 6%, transform 2%)\n

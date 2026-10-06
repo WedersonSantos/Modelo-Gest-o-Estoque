@@ -1,0 +1,44 @@
+
+> restaurante-gestao@1.0.0 build
+> prisma generate && next build
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma\schema.prisma.
+
+✔ Generated Prisma Client (v7.10.0) to .\node_modules\@prisma\client in 197ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env
+✓ Running next.config.ts took 34ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 635ms
+  Running TypeScript ...
+  Finished TypeScript in 2.5s ...
+  Collecting page data using 12 workers ...
+  Generating static pages using 12 workers (0/10) ...
+  Generating static pages using 12 workers (2/10)
+  Generating static pages using 12 workers (4/10)
+  Generating static pages using 12 workers (7/10)
+✓ Generating static pages using 12 workers (10/10) in 481ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /[...section]
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/register
+├ ƒ /api/commands
+├ ƒ /api/reports
+├ ○ /cadastro
+└ ○ /login
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand\n

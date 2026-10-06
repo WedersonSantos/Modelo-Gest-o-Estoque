@@ -1,0 +1,5 @@
+
+> restaurante-gestao@1.0.0 db:seed
+> tsx prisma/seed.ts
+
+Demonstração já cadastrada. Seed preservou os dados existentes.\n
