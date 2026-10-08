@@ -4,7 +4,7 @@ Data: 08/10/2026. Implementação concluída no checkout local com Next.js 16.3.
 
 ## Publicação Casa Anatolia
 
-Identidade atual: Casa Anatolia · Restaurante turco. Build de produção aprovada pelo Netlify. Logs: https://app.netlify.com/projects/demo-restaurante-vanessa/deploys/6ac7f4be3abbea3a55695fc3. As variáveis existentes de produção foram preservadas. A listagem completa dessas variáveis foi bloqueada pela revisão automática por poder capturar segredos; não foi necessária à publicação.
+Identidade atual: Casa Anatolia · Restaurante turco. Build de produção aprovada pelo Netlify usando `next build --webpack`. A primeira publicação revelou uma referência externa inválida do Prisma gerada pelo Turbopack no pacote serverless. A build foi alterada para Webpack e a função foi reconstruída sem reutilizar o cache. Logs: https://app.netlify.com/projects/demo-restaurante-vanessa/deploys/6ac7f5bb5525ba202d189835. Validação do site publicado: login HTTP 200; dashboard, pedidos, cozinha, importação fiscal e financeiro HTTP 200; navegação móvel validada sem transbordamento; nenhum erro JavaScript de página. Evidência: `.local/validation/casa-anatolia-production-check.log`. As variáveis existentes de produção foram preservadas. A listagem completa dessas variáveis foi bloqueada pela revisão automática por poder capturar segredos; não foi necessária à publicação.
 
 ## Resultado
 
@@ -38,7 +38,7 @@ Nova migration: `prisma/migrations/202610080001_orders_fiscal/migration.sql`.
 
 Adiciona MenuItem, Order, OrderItem, FiscalDocument e SupplierFiscalMapping, perfil KITCHEN, contador de pedidos por organização e relacionamentos. Inclui chaves estrangeiras compostas para isolamento entre organizações, unicidade de numeração/chave fiscal/associação, verificações de valores e timestamps e preservação imutável dos itens do pedido e documentos fiscais.
 
-A migration foi aplicada nos bancos locais `restaurante` e `restaurante_test`. `prisma migrate status` confirmou os dois atualizados, com 2 migrations. O seed local adicionou apenas três itens fictícios ao cardápio de demonstração e preservou os registros existentes. Atualização de publicação em 08/10/2026: a migration desta entrega também foi aplicada com sucesso no Neon. A versão Casa Anatolia · Restaurante turco foi publicada em https://demo-restaurante-vanessa.netlify.app, com Next.js Runtime 5.16.2. Deploy: 6ac7f4be3abbea3a55695fc3. O nome do restaurante de demonstração no Neon foi atualizado de Casa Zaatar para Casa Anatolia, sem recriar dados.
+A migration foi aplicada nos bancos locais `restaurante` e `restaurante_test`. `prisma migrate status` confirmou os dois atualizados, com 2 migrations. O seed local adicionou apenas três itens fictícios ao cardápio de demonstração e preservou os registros existentes. Atualização de publicação em 08/10/2026: a migration desta entrega também foi aplicada com sucesso no Neon. A versão Casa Anatolia · Restaurante turco foi publicada em https://demo-restaurante-vanessa.netlify.app, com Next.js Runtime 5.16.2. Deploy: 6ac7f5bb5525ba202d189835. O nome do restaurante de demonstração no Neon foi atualizado de Casa Zaatar para Casa Anatolia, sem recriar dados.
 
 ## Comportamentos e limites deliberados
 
