@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import type { Actor } from "@/shared/types/actor";
+import { assertRole } from "@/shared/lib/permissions";
 import { workspaceQuery, type WorkspaceFocus } from "../queries/workspace.repository";
 const day=z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v+"T12:00:00Z");return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;},"Data inválida.");
 const filters=z.object({from:day.optional(),to:day.optional(),context:z.enum(["RESTAURANT","EVENT","OTHER"]).optional()}).refine(f=>!f.from||!f.to||f.from<=f.to,"Período inválido.");
@@ -8,6 +9,7 @@ const focusSchema=z.object({kind:z.enum(["count","request","quote","order"]),id:
 type Json<T> = T extends Prisma.Decimal ? string : T extends Date ? string : T extends Array<infer U>? Json<U>[] : T extends object ? {[K in keyof T]:Json<T[K]>} : T;
 function asJson<T>(value:T):Json<T>{return JSON.parse(JSON.stringify(value));}
 export async function getWorkspaceData(actor:Actor,input:unknown={},includeAllPayables=false,focus?:WorkspaceFocus) {
+ assertRole(actor,["OWNER","ADMIN","BUYER","OPERATOR","VIEWER"]);
  const f=filters.parse(input);
  const selectedFocus=focusSchema.parse(focus);
  const today=new Date().toLocaleDateString("en-CA",{timeZone:"America/Sao_Paulo"});

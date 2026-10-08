@@ -15,7 +15,7 @@ const database = vi.hoisted(() => ({
   supplierQuote: { findMany: vi.fn() },
   purchaseOrder: { findMany: vi.fn(), count: vi.fn() },
   financialCategory: { findMany: vi.fn() },
-  financialEntry: { findMany: vi.fn(), groupBy: vi.fn() },
+  financialEntry: { findMany: vi.fn(), groupBy: vi.fn(), count: vi.fn() },
   goodsReceipt: { aggregate: vi.fn() },
   auditLog: { findMany: vi.fn() },
 }));
@@ -34,6 +34,7 @@ beforeEach(() => {
   database.user.findFirstOrThrow.mockResolvedValue({ id: owner.userId, name: "Usuário", role: owner.role });
   database.stockMovement.groupBy.mockResolvedValue([]);
   database.financialEntry.groupBy.mockResolvedValue([]);
+  database.financialEntry.count.mockResolvedValue(0);
   database.goodsReceipt.aggregate.mockResolvedValue({ _sum: { total: null } });
   database.purchaseOrder.count.mockResolvedValue(8);
 });

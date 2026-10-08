@@ -5,7 +5,7 @@ export async function workspaceQuery(actor:Actor,from:Date,to:Date,usageContext?
  const organizationId=actor.organizationId;
  const financeVisible=["OWNER","ADMIN","VIEWER"].includes(actor.role);
  const admin=["OWNER","ADMIN"].includes(actor.role);
- const [organization,user,products,categories,movements,counts,suppliers,requests,quotes,orders,financialCategories,entries,paidTotals,periodTotals,pendingTotals,purchaseTotals,consumption,audits,users,pendingOrderCount] = await Promise.all([
+ const [organization,user,products,categories,movements,counts,suppliers,requests,quotes,orders,financialCategories,entries,paidTotals,periodTotals,pendingTotals,purchaseTotals,consumption,audits,users,pendingOrderCount,financialSeries,previousTotals,overdueCount] = await Promise.all([
   prisma.organization.findUniqueOrThrow({where:{id:organizationId},select:{id:true,name:true}}),
   prisma.user.findFirstOrThrow({where:{id:actor.userId,organizationId},select:{id:true,name:true,email:true,role:true}}),
   prisma.product.findMany({where:{organizationId},include:{category:true},orderBy:{name:"asc"}}),
@@ -25,7 +25,10 @@ export async function workspaceQuery(actor:Actor,from:Date,to:Date,usageContext?
   prisma.stockMovement.groupBy({by:["productId"],where:{organizationId,type:"CONSUMPTION",createdAt:{gte:from,lt:to},...(usageContext?{usageContext}:{})},_sum:{quantity:true,totalCost:true}}),
   admin?prisma.auditLog.findMany({where:{organizationId},include:{user:{select:{name:true}}},orderBy:{createdAt:"desc"},take:50}):Promise.resolve([]),
   admin?prisma.user.findMany({where:{organizationId},select:{id:true,name:true,email:true,role:true,active:true},orderBy:{name:"asc"}}):Promise.resolve([]),
-  prisma.purchaseOrder.count({where:{organizationId,status:{notIn:["RECEIVED","CANCELED"]}}})
+  prisma.purchaseOrder.count({where:{organizationId,status:{notIn:["RECEIVED","CANCELED"]}}}),
+  financeVisible?prisma.financialEntry.groupBy({by:["paidAt","type"],where:{organizationId,status:"PAID",paidAt:{gte:from,lt:to}},_sum:{amount:true}}):Promise.resolve([]),
+  financeVisible?prisma.financialEntry.groupBy({by:["type"],where:{organizationId,status:"PAID",paidAt:{gte:new Date(from.getTime()-(to.getTime()-from.getTime())),lt:from}},_sum:{amount:true}}):Promise.resolve([]),
+  financeVisible?prisma.financialEntry.count({where:{organizationId,type:"EXPENSE",status:"PENDING",dueDate:{lt:new Date(new Date().toLocaleDateString("en-CA",{timeZone:"America/Sao_Paulo"})+"T00:00:00-03:00")}}}):Promise.resolve(0)
  ]);
- return {organization,user,products,categories,movements,counts,suppliers,requests,quotes,orders,financialCategories,entries,paidTotals,periodTotals,pendingTotals,purchaseTotals,consumption,audits,users,pendingOrderCount,financeVisible};
+ return {organization,user,products,categories,movements,counts,suppliers,requests,quotes,orders,financialCategories,entries,paidTotals,periodTotals,pendingTotals,purchaseTotals,consumption,audits,users,pendingOrderCount,financeVisible,financialSeries,previousTotals,overdueCount};
 }

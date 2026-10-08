@@ -20,6 +20,7 @@ test("família completa o fluxo pela interface",async({page},testInfo)=>{
  await page.getByRole("link",{name:"Continuar contagem"}).click();
  await page.getByLabel("Contagem de Grão para teste UI").fill("10");
  await page.getByRole("button",{name:"Finalizar inventário e ajustar estoque"}).click();
+ await page.getByRole("dialog").getByRole("button",{name:"Confirmar",exact:true}).click();
  await expect(page.getByText("Finalizado",{exact:true})).toBeVisible();
  await page.goto("/estoque/movimentacoes");
  await page.getByRole("combobox",{name:"Ingrediente",exact:true}).selectOption({label:"Grão para teste UI (kg)"});

@@ -12,6 +12,7 @@ import { ReportsView } from "@/shared/components/reports-view";
 import { SettingsView } from "@/modules/settings/components/settings-view";
 export default async function WorkspacePage({params,searchParams}:{params:Promise<{section:string[]}>;searchParams:Promise<Record<string,string|string[]|undefined>>}) {
  const {section}=await params;const query=await searchParams;const actor=await getActor().catch(e=>{if(e instanceof DomainError&&e.status===401)redirect("/login");throw e;});
+ if(actor.role==="KITCHEN")redirect("/cozinha");
  if(!["dashboard","estoque","compras","fornecedores","financeiro","relatorios","configuracoes"].includes(section[0]))notFound();
  const children:Record<string,string[]>={estoque:["produtos","movimentacoes","inventarios"],compras:["necessidades","listas","cotacoes","pedidos"],financeiro:["lancamentos","contas-pagar","categorias"]};
  if(section.length>3||(children[section[0]]&&section[1]&&!children[section[0]].includes(section[1])))notFound();

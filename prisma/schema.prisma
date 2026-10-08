@@ -12,6 +12,7 @@ enum Role {
   BUYER
   OPERATOR
   VIEWER
+  KITCHEN
 }
 
 enum Unit {
@@ -108,6 +109,12 @@ model Organization {
   financialCategories FinancialCategory[]
   financialEntries    FinancialEntry[]
   auditLogs           AuditLog[]
+  nextOrderNumber     Int @default(0)
+  menuItems           MenuItem[]
+  customerOrders      Order[]
+  customerOrderItems  OrderItem[]
+  fiscalDocuments     FiscalDocument[]
+  fiscalMappings      SupplierFiscalMapping[]
 }
 
 model User {
@@ -128,6 +135,8 @@ model User {
   requests       PurchaseRequest[]
   orders         PurchaseOrder[]
   receipts       GoodsReceipt[]
+  customerOrders Order[]
+  fiscalDocuments FiscalDocument[]
   entries        FinancialEntry[]
   auditLogs      AuditLog[]
   @@unique([id, organizationId])
@@ -187,6 +196,7 @@ model Product {
   quoteItems     SupplierQuoteItem[]
   orderItems     PurchaseOrderItem[]
   receiptItems   GoodsReceiptItem[]
+  fiscalMappings SupplierFiscalMapping[]
   @@unique([id, organizationId])
   @@unique([organizationId, name])
   @@index([organizationId, active])
@@ -269,6 +279,8 @@ model Supplier {
   products       SupplierProduct[]
   quotes         SupplierQuote[]
   orders         PurchaseOrder[]
+  fiscalDocuments FiscalDocument[]
+  fiscalMappings SupplierFiscalMapping[]
   @@unique([id, organizationId])
   @@unique([organizationId, name])
   @@index([organizationId, active])
@@ -405,6 +417,7 @@ model PurchaseOrder {
   creator           User @relation(fields: [createdBy, organizationId], references: [id, organizationId], onDelete: Restrict)
   items             PurchaseOrderItem[]
   receipts          GoodsReceipt[]
+  fiscalDocument    FiscalDocument?
   @@unique([id, organizationId])
   @@unique([quoteId, organizationId])
   @@index([organizationId, status, createdAt])
@@ -443,6 +456,7 @@ model GoodsReceipt {
   purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId, organizationId], references: [id, organizationId], onDelete: Restrict)
   creator         User @relation(fields: [createdBy, organizationId], references: [id, organizationId], onDelete: Restrict)
   items           GoodsReceiptItem[]
+  fiscalDocument  FiscalDocument?
   @@unique([id, organizationId])
   @@unique([organizationId, idempotencyKey])
   @@index([organizationId, purchaseOrderId])
@@ -516,4 +530,120 @@ model AuditLog {
   @@unique([id, organizationId])
   @@index([organizationId, createdAt])
   @@index([organizationId, entity, entityId])
+}
+
+enum CustomerOrderStatus {
+  DRAFT
+  SENT_TO_KITCHEN
+  PREPARING
+  READY
+  COMPLETED
+  CANCELED
+}
+
+enum OrderType {
+  TABLE
+  TAKEAWAY
+  DELIVERY
+}
+
+model MenuItem {
+  id String @id @default(cuid())
+  organizationId String
+  name String
+  description String?
+  price Decimal @db.Decimal(14, 2)
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  items OrderItem[]
+  @@unique([id, organizationId])
+  @@unique([organizationId, name])
+}
+
+model Order {
+  id String @id @default(cuid())
+  organizationId String
+  number Int
+  type OrderType
+  tableName String?
+  customerName String?
+  notes String?
+  status CustomerOrderStatus @default(DRAFT)
+  total Decimal @db.Decimal(14, 2)
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sentToKitchenAt DateTime?
+  preparingAt DateTime?
+  readyAt DateTime?
+  completedAt DateTime?
+  canceledAt DateTime?
+  cancellationReason String?
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  creator User @relation(fields: [createdBy, organizationId], references: [id, organizationId], onDelete: Restrict)
+  items OrderItem[]
+  @@unique([id, organizationId])
+  @@unique([organizationId, number])
+  @@index([organizationId, status, createdAt])
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+  organizationId String
+  orderId String
+  menuItemId String
+  name String
+  quantity Int
+  unitPrice Decimal @db.Decimal(14, 2)
+  totalPrice Decimal @db.Decimal(14, 2)
+  notes String?
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  order Order @relation(fields: [orderId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  menuItem MenuItem @relation(fields: [menuItemId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  @@unique([id, organizationId])
+}
+
+model FiscalDocument {
+  id String @id @default(cuid())
+  organizationId String
+  accessKey String?
+  source String
+  model String?
+  number String?
+  series String?
+  issuedAt DateTime
+  total Decimal @db.Decimal(14, 2)
+  data Json
+  supplierId String
+  purchaseOrderId String @unique
+  goodsReceiptId String @unique
+  createdBy String
+  createdAt DateTime @default(now())
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  supplier Supplier @relation(fields: [supplierId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  creator User @relation(fields: [createdBy, organizationId], references: [id, organizationId], onDelete: Restrict)
+  @@unique([id, organizationId])
+  @@unique([organizationId, accessKey])
+  @@unique([purchaseOrderId, organizationId])
+  @@unique([goodsReceiptId, organizationId])
+}
+
+model SupplierFiscalMapping {
+  id String @id @default(cuid())
+  organizationId String
+  supplierId String
+  productId String
+  mappingKey String
+  supplierProductCode String?
+  gtin String?
+  fiscalDescription String
+  createdAt DateTime @default(now())
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  supplier Supplier @relation(fields: [supplierId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  product Product @relation(fields: [productId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  @@unique([organizationId, supplierId, mappingKey])
 }

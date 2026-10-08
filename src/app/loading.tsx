@@ -1,1 +1,2 @@
-export default function Loading(){return <div className="page-loading" role="status">Carregando o restaurante…</div>;}
+import { LoadingSkeleton } from "@/shared/components/design-system";
+export default LoadingSkeleton;
