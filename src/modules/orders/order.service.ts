@@ -1,3 +1,5 @@
+import { customerSchema } from "@/modules/customers/customer.rules";
+import { customerSelect, saveCustomerInTransaction, type CustomerDTO } from "@/modules/customers/customer.service";
 import { z } from "zod";
 import { prisma, transaction } from "@/shared/lib/prisma";
 import { assertRole } from "@/shared/lib/permissions";
@@ -8,7 +10,7 @@ import { dec, money } from "@/shared/lib/money";
 import { ORDER_ROLES,KITCHEN_ROLES,validateOrderTransition } from "./order.rules";
 const text=z.string().trim().max(500).optional();
 const menuSchema=z.object({id:z.string().optional(),name:z.string().trim().min(2).max(120),description:text,price:z.string().regex(/^\d{1,10}(\.\d{1,2})?$/).refine(v=>dec(v).gt(0),"Informe um preço maior que zero."),active:z.boolean().default(true)});
-export const createOrderSchema=z.object({type:z.enum(["TABLE","TAKEAWAY","DELIVERY"]),tableName:z.string().trim().max(60).optional(),customerName:z.string().trim().max(120).optional(),notes:text,items:z.array(z.object({menuItemId:z.string().min(1),quantity:z.coerce.number().int().min(1).max(999),notes:text})).min(1).max(100)}).refine(d=>d.type!=="TABLE"||!!d.tableName,"Informe a mesa.");
+export const createOrderSchema=z.object({type:z.enum(["TABLE","TAKEAWAY","DELIVERY"]),tableName:z.string().trim().max(60).optional(),customerName:z.string().trim().max(120).optional(),notes:text,customerId:z.string().min(1).optional(),newCustomer:customerSchema.optional(),items:z.array(z.object({menuItemId:z.string().min(1),quantity:z.coerce.number().int().min(1).max(999),notes:text})).min(1).max(100)} ).refine(d=>!(d.customerId && d.newCustomer),"Selecione ou cadastre um cliente.").refine(d=>d.type!=="TABLE"||!!d.tableName,"Informe a mesa.");
 export async function saveMenuItem(actor:Actor,input:unknown){
  assertRole(actor,["OWNER","ADMIN"]);const d=menuSchema.parse(input);
  return transaction(async tx=>{
@@ -19,21 +21,25 @@ export async function saveMenuItem(actor:Actor,input:unknown){
 }
 export async function getOrders(actor:Actor){
  assertRole(actor,ORDER_ROLES);
- const [menu,orders]=await Promise.all([prisma.menuItem.findMany({where:{organizationId:actor.organizationId},orderBy:{name:"asc"}}),prisma.order.findMany({where:{organizationId:actor.organizationId},include:{items:true},orderBy:{createdAt:"desc"},take:100})]);
- return JSON.parse(JSON.stringify({menu,orders,role:actor.role})) as OrdersData;
+ const [menu,orders,customers]=await Promise.all([prisma.menuItem.findMany({where:{organizationId:actor.organizationId},orderBy:{name:"asc"}}),prisma.order.findMany({where:{organizationId:actor.organizationId},include:{items:true},orderBy:{createdAt:"desc"},take:100}),prisma.customer.findMany({where:{organizationId:actor.organizationId,active:true},select:customerSelect,orderBy:{name:"asc"},take:50})]);
+ return JSON.parse(JSON.stringify({menu,orders,customers,role:actor.role})) as OrdersData;
 }
-export type OrdersData={role:string;menu:{id:string;name:string;description:string|null;price:string;active:boolean}[];orders:OrderDTO[]};
-export type OrderDTO={id:string;number:number;type:string;tableName:string|null;customerName:string|null;notes:string|null;status:string;total:string;createdAt:string;sentToKitchenAt:string|null;items:{id:string;name:string;quantity:number;notes:string|null}[]};
+export type OrdersData={role:string;customers:CustomerDTO[];menu:{id:string;name:string;description:string|null;price:string;active:boolean}[];orders:OrderDTO[]};
+export type OrderDTO={id:string;number:number;type:string;tableName:string|null;customerName:string|null;customerId:string|null;notes:string|null;status:string;total:string;createdAt:string;sentToKitchenAt:string|null;items:{id:string;name:string;quantity:number;notes:string|null}[]};
 export async function createOrder(actor:Actor,input:unknown){
  assertRole(actor,ORDER_ROLES);const d=createOrderSchema.parse(input);
  return transaction(async tx=>{
+  const customer=d.customerId ? await tx.customer.findFirst({where:{id:d.customerId,organizationId:actor.organizationId,active:true},select:customerSelect}) : d.newCustomer ? await saveCustomerInTransaction(tx,actor,d.newCustomer) : null;
+  if(d.customerId) assert(customer,"Cliente não encontrado ou inativo.",404);
   const menu=await tx.menuItem.findMany({where:{organizationId:actor.organizationId,id:{in:d.items.map(i=>i.menuItemId)},active:true}});
   const items=d.items.map(i=>{const item=menu.find(m=>m.id===i.menuItemId);assert(item,"Há um item indisponível no cardápio.",409);return {...i,organizationId:actor.organizationId,name:item.name,unitPrice:item.price,totalPrice:money(item.price.mul(i.quantity))};});
   const org=await tx.organization.update({where:{id:actor.organizationId},data:{nextOrderNumber:{increment:1}},select:{nextOrderNumber:true}});
-  const order=await tx.order.create({data:{organizationId:actor.organizationId,number:org.nextOrderNumber,type:d.type,tableName:d.type==="TABLE"?d.tableName:null,customerName:d.customerName,notes:d.notes,createdBy:actor.userId,total:items.reduce((s,i)=>s.plus(i.totalPrice),dec(0)),},include:{items:true}});
+  const order=await tx.order.create({data:{organizationId:actor.organizationId,number:org.nextOrderNumber,type:d.type,tableName:d.type==="TABLE"?d.tableName:null,customerId:customer?.id,customerName:customer?.name ?? d.customerName,notes:d.notes,createdBy:actor.userId,total:items.reduce((s,i)=>s.plus(i.totalPrice),dec(0)),},include:{items:true}});
   await tx.orderItem.createMany({data:items.map(i=>({...i,orderId:order.id}))});
   order.items=await tx.orderItem.findMany({where:{orderId:order.id,organizationId:actor.organizationId}});
-  await audit(tx,actor,"ORDER_CREATED","Order",order.id);return order;
+  await audit(tx,actor,"ORDER_CREATED","Order",order.id);
+  const possibleCustomerDuplicates=d.newCustomer && customer?.phoneNormalized ? await tx.customer.findMany({where:{organizationId:actor.organizationId,phoneNormalized:customer.phoneNormalized,id:{not:customer.id}},select:{id:true,name:true},take:10}) : [];
+  return {...order,possibleCustomerDuplicates};
  });
 }
 export async function transitionOrder(actor:Actor,input:unknown){

@@ -115,6 +115,8 @@ model Organization {
   customerOrderItems  OrderItem[]
   fiscalDocuments     FiscalDocument[]
   fiscalMappings      SupplierFiscalMapping[]
+  customers           Customer[]
+  customerAddresses   CustomerAddress[]
 }
 
 model User {
@@ -569,6 +571,7 @@ model Order {
   type OrderType
   tableName String?
   customerName String?
+  customerId String?
   notes String?
   status CustomerOrderStatus @default(DRAFT)
   total Decimal @db.Decimal(14, 2)
@@ -583,7 +586,9 @@ model Order {
   cancellationReason String?
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   creator User @relation(fields: [createdBy, organizationId], references: [id, organizationId], onDelete: Restrict)
+  customer Customer? @relation(fields: [customerId, organizationId], references: [id, organizationId], onDelete: Restrict)
   items OrderItem[]
+  @@index([organizationId, customerId, createdAt])
   @@unique([id, organizationId])
   @@unique([organizationId, number])
   @@index([organizationId, status, createdAt])
@@ -646,4 +651,48 @@ model SupplierFiscalMapping {
   supplier Supplier @relation(fields: [supplierId, organizationId], references: [id, organizationId], onDelete: Restrict)
   product Product @relation(fields: [productId, organizationId], references: [id, organizationId], onDelete: Restrict)
   @@unique([organizationId, supplierId, mappingKey])
+}
+
+model Customer {
+  id String @id @default(cuid())
+  organizationId String
+  name String
+  phone String?
+  phoneNormalized String?
+  email String?
+  birthDate DateTime? @db.Date
+  notes String?
+  active Boolean @default(true)
+  marketingConsent Boolean @default(false)
+  marketingConsentAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  orders Order[]
+  addresses CustomerAddress[]
+  @@unique([id, organizationId])
+  @@index([organizationId, active, name])
+  @@index([organizationId, phoneNormalized])
+  @@index([organizationId, email])
+}
+
+model CustomerAddress {
+  id String @id @default(cuid())
+  organizationId String
+  customerId String
+  label String?
+  street String
+  number String?
+  complement String?
+  neighborhood String?
+  city String
+  state String?
+  postalCode String?
+  country String @default("BR")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  customer Customer @relation(fields: [customerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  @@unique([id, organizationId])
+  @@index([organizationId, customerId])
 }

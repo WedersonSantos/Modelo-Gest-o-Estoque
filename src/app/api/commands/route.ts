@@ -9,8 +9,9 @@ import * as finance from "@/modules/finance";
 import * as settings from "@/modules/settings";
 import { createOrder,saveMenuItem,transitionOrder } from "@/modules/orders/order.service";
 import { previewFiscal,confirmFiscal } from "@/modules/fiscal/fiscal.service";
+import { createCustomer,updateCustomer,setCustomerActive } from "@/modules/customers/customer.service";
 const commands:Record<string,(actor:Actor,input:unknown)=>Promise<unknown>>={
- createOrder,saveMenuItem,transitionOrder,previewFiscal,confirmFiscal,
+ createCustomer,updateCustomer,setCustomerActive,createOrder,saveMenuItem,transitionOrder,previewFiscal,confirmFiscal,
  createProduct:(a,p)=>inventory.createProduct(a,p),updateProduct:(a,p)=>inventory.updateProduct(a,p),recordMovement:(a,p)=>inventory.recordMovement(a,p),createInventoryCount:(a,p)=>inventory.createInventoryCount(a,p),finishInventoryCount:(a,p)=>inventory.finishInventoryCount(a,p),cancelInventoryCount:(a,p)=>inventory.cancelInventoryCount(a,p),
  createSupplier:(a,p)=>suppliers.createSupplier(a,p),updateSupplier:(a,p)=>suppliers.updateSupplier(a,p),setSupplierPrice:(a,p)=>suppliers.setSupplierPrice(a,p),
  generatePurchaseRequest:a=>purchasing.generatePurchaseRequest(a),updatePurchaseRequest:(a,p)=>purchasing.updatePurchaseRequest(a,p),createQuote:(a,p)=>purchasing.createQuote(a,p),createPurchaseOrder:(a,p)=>purchasing.createPurchaseOrder(a,p),transitionPurchaseOrder:(a,p)=>purchasing.transitionPurchaseOrder(a,p),receivePurchaseOrder:(a,p)=>purchasing.receivePurchaseOrder(a,p),
