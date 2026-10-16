@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { originFields } from "./origin.schema";
 
 // PostgreSQL Decimal(14,4): ten whole digits, four fractional digits.
 export const nonnegativeDecimalSchema = z.string().trim()
@@ -15,6 +16,7 @@ export const productUnitSchema = z.enum(["KG", "G", "L", "ML", "UNIT", "PACKAGE"
 export const usageContextSchema = z.enum(["RESTAURANT", "EVENT", "OTHER"]);
 
 export const createProductSchema = z.object({
+  ...originFields,
   name: z.string().trim().min(2, "Informe o nome do ingrediente.").max(160),
   description: shortText,
   categoryId: identifier.nullable().optional(),

@@ -3,10 +3,10 @@ import { prisma } from "@/shared/lib/prisma";
 
 type Database = Prisma.TransactionClient;
 
-export function listProducts(organizationId: string, db: Database = prisma) {
+export function listProducts(organizationId: string, db: Database = prisma, originType?: "NATIONAL"|"IMPORTED") {
   return db.product.findMany({
-    where: { organizationId },
-    include: { category: true },
+    where: { organizationId, ...(originType ? {originType} : {}) },
+    include: { category: true, suppliers:{where:{organizationId,active:true,supplier:{organizationId,active:true}},select:{supplier:{select:{country:true}}}} },
     orderBy: [{ active: "desc" }, { name: "asc" }],
   });
 }

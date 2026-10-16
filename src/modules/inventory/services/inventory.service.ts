@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { prisma } from "@/shared/lib/prisma";
+import { assertRole } from "@/shared/lib/permissions";
 import { Prisma } from "@prisma/client";
 import { type Actor } from "@/shared/lib/auth";
 import { listInventoryCounts } from "../repositories/inventory-count.repository";
@@ -6,9 +9,11 @@ import { listConsumptionMovements, listStockMovements } from "../repositories/st
 import { inventoryReportFilterSchema } from "../schemas/inventory.schema";
 import { movementDto, productDto } from "./inventory.dto";
 
-export async function listInventory(actor: Actor) {
+export async function listInventory(actor: Actor,input:unknown={}) {
+  assertRole(actor,["OWNER","ADMIN","BUYER","OPERATOR","VIEWER"]);
+  const filter=z.object({originType:z.enum(["NATIONAL","IMPORTED"]).optional()}).parse(input);
   const [products, categories, movements, counts] = await Promise.all([
-    listProducts(actor.organizationId),
+    listProducts(actor.organizationId,prisma,filter.originType),
     listProductCategories(actor.organizationId),
     listStockMovements(actor.organizationId),
     listInventoryCounts(actor.organizationId),

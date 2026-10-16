@@ -5,6 +5,7 @@ const decimal = z.string().regex(/^\d{1,9}(\.\d{1,4})?$/, "Informe um valor posi
 
 export const supplierSchema = z.object({
   name: z.string().trim().min(2, "Informe o nome do fornecedor.").max(120),
+  country:z.string().trim().max(100).nullish().transform(v=>v||null).optional(),
   companyName: optionalText,
   document: optionalText,
   phone: optionalText,

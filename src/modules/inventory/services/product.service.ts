@@ -22,6 +22,7 @@ export async function createProduct(actor: Actor, input: unknown) {
       description: data.description || null,
       categoryId: data.categoryId || null,
       unit: data.unit,
+      originType:data.originType, countryOfOrigin:data.countryOfOrigin, supplierCountry:data.supplierCountry, purchaseCurrency:data.purchaseCurrency, averageLeadTimeDays:data.averageLeadTimeDays, originNotes:data.originNotes,
       minimumStock: quantity(data.minimumStock),
       idealStock: quantity(data.idealStock),
       currentStock: "0",
@@ -49,6 +50,7 @@ export async function updateProduct(actor: Actor, input: unknown) {
       throw new DomainError("Zere o estoque por uma movimentação antes de desativar o ingrediente.", 409);
     }
     const product = await products.updateProductFields(tx, actor.organizationId, data.id, {
+      originType:data.originType, countryOfOrigin:data.countryOfOrigin, supplierCountry:data.supplierCountry, purchaseCurrency:data.purchaseCurrency, averageLeadTimeDays:data.averageLeadTimeDays, originNotes:data.originNotes,
       name: data.name,
       description: data.description || null,
       categoryId: data.categoryId || null,

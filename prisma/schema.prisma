@@ -15,6 +15,11 @@ enum Role {
   KITCHEN
 }
 
+enum ProductOriginType {
+  NATIONAL
+  IMPORTED
+}
+
 enum Unit {
   KG
   G
@@ -115,6 +120,8 @@ model Organization {
   customerOrderItems  OrderItem[]
   fiscalDocuments     FiscalDocument[]
   fiscalMappings      SupplierFiscalMapping[]
+  employees           Employee[]
+  jobRoles            JobRole[]
   customers           Customer[]
   customerAddresses   CustomerAddress[]
 }
@@ -137,6 +144,7 @@ model User {
   requests       PurchaseRequest[]
   orders         PurchaseOrder[]
   receipts       GoodsReceipt[]
+  employee       Employee?
   customerOrders Order[]
   fiscalDocuments FiscalDocument[]
   entries        FinancialEntry[]
@@ -182,6 +190,12 @@ model Product {
   description    String?
   categoryId     String?
   unit           Unit
+  originType     ProductOriginType @default(NATIONAL)
+  countryOfOrigin String?
+  supplierCountry String?
+  purchaseCurrency String @default("BRL")
+  averageLeadTimeDays Int?
+  originNotes String?
   minimumStock   Decimal @default(0) @db.Decimal(14, 4)
   idealStock     Decimal @default(0) @db.Decimal(14, 4)
   currentStock   Decimal @default(0) @db.Decimal(14, 4)
@@ -199,6 +213,7 @@ model Product {
   orderItems     PurchaseOrderItem[]
   receiptItems   GoodsReceiptItem[]
   fiscalMappings SupplierFiscalMapping[]
+  @@index([organizationId, originType])
   @@unique([id, organizationId])
   @@unique([organizationId, name])
   @@index([organizationId, active])
@@ -267,6 +282,7 @@ model Supplier {
   id             String @id @default(cuid())
   organizationId String
   name           String
+  country        String?
   companyName    String?
   document       String?
   phone          String?
@@ -695,4 +711,42 @@ model CustomerAddress {
   customer Customer @relation(fields: [customerId, organizationId], references: [id, organizationId], onDelete: Restrict)
   @@unique([id, organizationId])
   @@index([organizationId, customerId])
+}
+
+model JobRole {
+ id String @id @default(cuid())
+ organizationId String
+ name String
+ description String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+ employees Employee[]
+ @@unique([id, organizationId])
+ @@unique([organizationId, name])
+}
+
+model Employee {
+ id String @id @default(cuid())
+ organizationId String
+ name String
+ phone String?
+ email String?
+ jobRoleId String?
+ userId String? @unique
+ department String?
+ responsibilities String?
+ hiredAt DateTime? @db.Date
+ active Boolean @default(true)
+ notes String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+ jobRole JobRole? @relation(fields: [jobRoleId, organizationId], references: [id, organizationId], onDelete: Restrict)
+ user User? @relation(fields: [userId, organizationId], references: [id, organizationId], onDelete: Restrict)
+ @@unique([id, organizationId])
+ @@unique([userId, organizationId])
+ @@index([organizationId, active, name])
+ @@index([organizationId, jobRoleId])
+ @@index([organizationId, department])
 }
