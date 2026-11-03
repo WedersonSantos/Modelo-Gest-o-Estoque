@@ -1,0 +1,20 @@
+import {test,expect} from "@playwright/test";
+test("auditoria apresenta ações e registros legíveis",async({page},testInfo)=>{
+ const suffix=Date.now()+"-"+testInfo.project.name,errors:string[]=[];page.on("pageerror",e=>errors.push(e.message));
+ await page.goto("/cadastro");await page.getByLabel("Nome do restaurante").fill("Restaurante auditoria "+suffix);await page.getByLabel("Seu nome").fill("Responsável fictício");await page.getByLabel("E-mail",{exact:true}).fill("audit-ui-"+suffix+"@example.test");await page.getByLabel("Senha",{exact:true}).fill("TesteUI@123456");await page.getByRole("button",{name:"Criar restaurante",exact:true}).click();await expect(page).toHaveURL(/dashboard/);
+ await page.goto("/configuracoes");
+ const audit=page.locator("section").filter({has:page.getByRole("heading",{name:"Auditoria",exact:true})});
+ await expect(audit.getByRole("cell",{name:"Restaurante cadastrado",exact:true})).toBeVisible();
+ await page.getByLabel("Nome da categoria").fill("Categoria legível");
+ await page.getByRole("button",{name:"Criar categoria",exact:true}).click();
+ const row=audit.getByRole("row").filter({hasText:"Categoria legível"});
+ await expect(row).toBeVisible();await expect(row.getByRole("cell").nth(2)).toHaveText("Cadastro criado");await expect(row.getByRole("cell").nth(3)).toContainText("Categoria de ingredientes");
+ await expect(row.getByRole("cell").first()).toContainText(/\d{2}\/\d{2}\/\d{4}.*\d{2}:\d{2}/);
+ await expect(row.locator("code").first()).toBeHidden();
+ await row.getByText("Referência técnica",{exact:true}).click();
+ await expect(row.locator("code").first()).toHaveText("CREATE");await expect(row.locator("code").nth(1)).toHaveText("ProductCategory");expect((await row.locator("code").nth(2).innerText()).length).toBeGreaterThan(6);
+ await row.getByText("Referência técnica",{exact:true}).click();
+ await audit.screenshot({path:"test-results/auditoria-"+testInfo.project.name+".png"});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ expect(errors).toEqual([]);
+});
