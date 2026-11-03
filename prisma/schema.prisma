@@ -535,6 +535,8 @@ model FinancialEntry {
 }
 
 model AuditLog {
+  actorRole      Role?
+  actorEmployeeName String?
   id             String @id @default(cuid())
   organizationId String
   userId         String

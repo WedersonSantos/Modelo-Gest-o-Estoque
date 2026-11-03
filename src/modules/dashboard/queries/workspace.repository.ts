@@ -23,7 +23,7 @@ export async function workspaceQuery(actor:Actor,from:Date,to:Date,usageContext?
   financeVisible?prisma.financialEntry.groupBy({by:["type"],where:{organizationId,status:"PENDING"},_sum:{amount:true},_count:true}):Promise.resolve([]),
   financeVisible?prisma.goodsReceipt.aggregate({where:{organizationId,receivedAt:{gte:from,lt:to}},_sum:{total:true}}):Promise.resolve({_sum:{total:null}}),
   prisma.stockMovement.groupBy({by:["productId"],where:{organizationId,type:"CONSUMPTION",createdAt:{gte:from,lt:to},...(usageContext?{usageContext}:{})},_sum:{quantity:true,totalCost:true}}),
-  admin?prisma.auditLog.findMany({where:{organizationId},include:{user:{select:{name:true}}},orderBy:{createdAt:"desc"},take:50}):Promise.resolve([]),
+  Promise.resolve([]), // Audit rows are loaded only by the paginated settings query.
   admin?prisma.user.findMany({where:{organizationId},select:{id:true,name:true,email:true,role:true,active:true},orderBy:{name:"asc"}}):Promise.resolve([]),
   prisma.purchaseOrder.count({where:{organizationId,status:{notIn:["RECEIVED","CANCELED"]}}}),
   financeVisible?prisma.financialEntry.groupBy({by:["paidAt","type"],where:{organizationId,status:"PAID",paidAt:{gte:from,lt:to}},_sum:{amount:true}}):Promise.resolve([]),

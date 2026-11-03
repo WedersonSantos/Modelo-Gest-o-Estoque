@@ -51,7 +51,7 @@ test("funcionários e origem funcionam em desktop e celular",async({page},testIn
  await page.getByLabel("Senha inicial").fill("TesteUI@123456");
  await page.getByRole("combobox",{name:"Perfil",exact:true}).selectOption("KITCHEN");
  await page.getByRole("button",{name:"Cadastrar usuário",exact:true}).click();
- await expect(page.getByRole("status")).toContainText("Salvo com sucesso");
+ await expect(page.getByRole("status").filter({hasText:"Salvo com sucesso"})).toContainText("Salvo com sucesso");
  await page.goto(employeeUrl);
  await page.getByRole("combobox",{name:"Usuário vinculado (opcional)",exact:true}).selectOption({label:"Usuário cozinha · "+kitchenEmail+" · Cozinha"});
  await page.getByRole("button",{name:"Salvar alterações",exact:true}).click();
@@ -96,6 +96,6 @@ test("funcionários e origem funcionam em desktop e celular",async({page},testIn
  await page.evaluate(async()=>{await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});});
  await page.goto("/login");await page.getByLabel("E-mail").fill(kitchenEmail);await page.getByLabel("Senha",{exact:true}).fill("TesteUI@123456");
  await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page).toHaveURL(/cozinha/);
- const access=await page.evaluate(async()=>({employees:(await fetch("/api/employees")).status,options:(await fetch("/api/employees?options=true")).status,finance:(await fetch("/api/reports")).status,create:(await fetch("/api/commands",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({command:"createEmployee",payload:{name:"Não autorizado"}})})).status}));
- expect(access).toEqual({employees:403,options:403,finance:403,create:403});expect(errors).toEqual([]);
+ const access=await page.evaluate(async()=>({audits:(await fetch("/api/audit")).status,employees:(await fetch("/api/employees")).status,options:(await fetch("/api/employees?options=true")).status,finance:(await fetch("/api/reports")).status,create:(await fetch("/api/commands",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({command:"createEmployee",payload:{name:"Não autorizado"}})})).status}));
+ expect(access).toEqual({audits:403,employees:403,options:403,finance:403,create:403});expect(errors).toEqual([]);
 });

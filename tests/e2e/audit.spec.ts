@@ -14,6 +14,45 @@ test("auditoria apresenta ações e registros legíveis",async({page},testInfo)=
  await row.getByText("Referência técnica",{exact:true}).click();
  await expect(row.locator("code").first()).toHaveText("CREATE");await expect(row.locator("code").nth(1)).toHaveText("ProductCategory");expect((await row.locator("code").nth(2).innerText()).length).toBeGreaterThan(6);
  await row.getByText("Referência técnica",{exact:true}).click();
+
+ await expect(row.getByRole("cell").nth(1)).toContainText("Proprietário");
+ await expect(row.getByRole("cell").nth(1)).toContainText("Perfil na operação");
+ await page.evaluate(async()=>{
+  const command=async(command:string,payload:unknown)=>{
+   const response=await fetch("/api/commands",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({command,payload})});
+   if(!response.ok)throw Error("Falha nos dados fictícios de paginação.");
+  };
+  const options=await (await fetch("/api/employees?options=true")).json();
+  const owner=options.users.find((u:{role:string})=>u.role==="OWNER");
+  await command("createEmployee",{name:"Colaborador da auditoria",userId:owner.id});
+  for(let i=0;i<23;i++)await command("createCategory",{name:"Categoria paginação "+String(i).padStart(2,"0")});
+ });
+ await page.reload();
+ await expect(audit.locator("tbody tr")).toHaveCount(10);
+ await expect(audit.getByText("Página 1 de 3",{exact:true})).toBeVisible();
+ await expect(audit.locator("tbody tr").first().getByRole("cell").nth(1)).toContainText("Funcionário: Colaborador da auditoria");
+ await audit.getByRole("button",{name:"Próxima",exact:true}).scrollIntoViewIfNeeded();
+ const scrollBefore=await page.evaluate(()=>window.scrollY);
+ const firstIds=await audit.locator("tbody tr code:last-child").allTextContents();
+ await audit.getByRole("button",{name:"Próxima",exact:true}).click();
+ await expect(audit.getByText("Página 2 de 3",{exact:true})).toBeVisible();
+ expect(Math.abs(await page.evaluate(()=>window.scrollY)-scrollBefore)).toBeLessThan(50);
+ expect(await audit.locator("tbody tr code:last-child").allTextContents()).not.toEqual(firstIds);
+ const today=new Date().toLocaleDateString("en-CA",{timeZone:"America/Sao_Paulo"});
+ await audit.getByLabel("Data inicial",{exact:true}).fill(today);await audit.getByLabel("Data final",{exact:true}).fill(today);
+ const filtered=page.waitForResponse(r=>r.url().includes("/api/audit?")&&new URL(r.url()).searchParams.get("from")===today);
+ await audit.getByRole("button",{name:"Filtrar histórico",exact:true}).click();expect((await filtered).status()).toBe(200);
+ await expect(audit.getByText("Página 1 de 3",{exact:true})).toBeVisible();
+ await audit.getByRole("button",{name:"Próxima",exact:true}).click();await expect(audit.getByText("Página 2 de 3",{exact:true})).toBeVisible();
+ await expect(audit.getByLabel("Data inicial",{exact:true})).toHaveValue(today);
+ await audit.getByLabel("Data inicial",{exact:true}).fill("2000-01-01");await audit.getByLabel("Data final",{exact:true}).fill("2000-01-01");
+ await audit.getByRole("button",{name:"Filtrar histórico",exact:true}).click();
+ await expect(audit.getByText("Nenhuma ação encontrada neste período. Ajuste as datas ou limpe o filtro.",{exact:true})).toBeVisible();
+ await expect(audit.getByRole("button",{name:"Próxima",exact:true})).toBeDisabled();
+ await audit.getByRole("button",{name:"Limpar datas",exact:true}).click();await expect(audit.locator("tbody tr")).toHaveCount(10);
+ await expect(audit.getByText("Página 1 de 3",{exact:true})).toBeVisible();
+ expect(await audit.locator(".table-scroll").evaluate(el=>el.scrollHeight>el.clientHeight)).toBe(true);
+ await audit.locator(".table-scroll").evaluate(el=>{el.scrollTop=0;el.scrollLeft=0;});
  await audit.screenshot({path:"test-results/auditoria-"+testInfo.project.name+".png"});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  expect(errors).toEqual([]);
