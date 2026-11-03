@@ -15,4 +15,4 @@ V1: estoque, inventários, fornecedores, preços, cotações, pedidos, recebimen
 ## Product Principles
 Simplicidade; histórico preservado; decimais; isolamento por organização; decisões comerciais humanas.
 ## Open Decisions
-Nome comercial: Casa Anatolia. Paleta, navegação e hierarquia definidas no briefing de redesign. MenuItem é separado de Product; pedidos não baixam ingredientes nem lançam receita sem ficha técnica ou pagamento.
+Nome comercial: Nome restaurante. Paleta, navegação e hierarquia definidas no briefing de redesign. MenuItem é separado de Product; pedidos não baixam ingredientes nem lançam receita sem ficha técnica ou pagamento.

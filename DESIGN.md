@@ -1,4 +1,4 @@
-# Design system Casa Anatolia
+# Design system Nome restaurante
 
 Modo: Operate. Usuários de pequenos restaurantes consultam a operação durante o atendimento, em computadores, tablets na cozinha e celulares sob iluminação intensa.
 

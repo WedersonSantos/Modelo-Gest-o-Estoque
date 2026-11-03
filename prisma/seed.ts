@@ -19,13 +19,13 @@ async function seedMenu(tx: Prisma.TransactionClient) {
 }
 async function main() {
   if (await prisma.organization.findUnique({ where: { id: organizationId } })) {
-    await prisma.$transaction(async tx=>{await tx.organization.updateMany({where:{id:organizationId,name:"Casa Zaatar · Demonstração"},data:{name:"Casa Anatolia · Demonstração"}});await seedMenu(tx);});
+    await prisma.$transaction(async tx=>{await tx.organization.updateMany({where:{id:organizationId,name:{in:["Casa Zaatar · Demonstração","Casa Anatolia · Demonstração"]}},data:{name:"Nome restaurante · Demonstração"}});await seedMenu(tx);});
     console.log("Demonstração já cadastrada. Seed preservou os dados existentes.");
     return;
   }
   const passwordHash = await hash("Demo@123456", 12);
   await prisma.$transaction(async (tx) => {
-    await tx.organization.create({ data: { id: organizationId, name: "Casa Anatolia · Demonstração" } });
+    await tx.organization.create({ data: { id: organizationId, name: "Nome restaurante · Demonstração" } });
     await tx.user.create({ data: { id: userId, organizationId, name: "Administrador de demonstração", email: "admin@exemplo.com", passwordHash, role: "OWNER" } });
     await seedMenu(tx);
     const categoryNames = ["Proteínas", "Grãos e farinhas", "Temperos e molhos", "Hortifruti", "Padaria"];
