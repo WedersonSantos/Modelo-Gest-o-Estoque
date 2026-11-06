@@ -22,7 +22,7 @@ export default async function WorkspacePage({params,searchParams}:{params:Promis
  const kinds:Record<string,WorkspaceFocus["kind"]>={"estoque/inventarios":"count","compras/listas":"request","compras/cotacoes":"quote","compras/pedidos":"order"};
  const kind=kinds[section.slice(0,2).join("/")];
  const focus=kind&&section[2]&&section[2]!=="novo"?{kind,id:section[2]}:undefined;
- const data=await getWorkspaceData(actor,{from:typeof query.from==="string"?query.from:undefined,to:typeof query.to==="string"?query.to:undefined,context:typeof query.context==="string"&&query.context?query.context:undefined},section[0]==="financeiro"&&section[1]==="contas-pagar",focus);
+ const data=await getWorkspaceData(actor,{from:typeof query.from==="string"?query.from:undefined,to:typeof query.to==="string"?query.to:undefined,context:typeof query.context==="string"&&query.context?query.context:undefined},section[0]==="financeiro"&&section[1]==="contas-pagar",focus,section);
  if(focus&&!({count:data.counts,request:data.requests,quote:data.quotes,order:data.orders}[focus.kind].some(r=>r.id===focus.id)))notFound();
  if(section[0]==="estoque"&&section[1]==="produtos"&&section[2]&&section[2]!=="novo"&&!data.products.some(p=>p.id===section[2]))notFound();
  if(section[0]==="fornecedores"&&section[1]&&section[1]!=="novo"&&!data.suppliers.some(s=>s.id===section[1]))notFound();

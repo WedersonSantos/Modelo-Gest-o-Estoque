@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createHash, randomBytes } from "node:crypto";
 import { compare } from "bcryptjs";
 import { cookies } from "next/headers";
@@ -15,14 +16,15 @@ const hashToken = (token: string) => createHash("sha256").update(token).digest("
 // A fixed valid hash ensures absent accounts also perform the expensive password comparison.
 const DUMMY_HASH = "$2b$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW";
 
-export async function getActor(): Promise<Actor> {
+// Deduplicate layout/page authentication only within the current server render.
+export const getActor = cache(async (): Promise<Actor> => {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
   assert(token && /^[a-f0-9]{64}$/.test(token), "Entre na sua conta para continuar.", 401);
   const session = await prisma.session.findUnique({ where: { tokenHash: hashToken(token) }, include: { user: true } });
   assert(session && session.expiresAt > new Date() && session.user.active, "Sua sessão expirou. Entre novamente.", 401);
   return { userId: session.user.id, organizationId: session.user.organizationId, role: session.user.role };
-}
+});
 
 export const requireActor = getActor;
 

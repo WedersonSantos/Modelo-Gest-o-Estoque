@@ -116,3 +116,53 @@ describe("queries do dashboard", () => {
     expect(database.organization.findUniqueOrThrow).not.toHaveBeenCalled();
   });
 });
+
+describe("carregamento por página", () => {
+ const countCalls=()=>Object.values(database).flatMap(model=>Object.values(model)).reduce((sum,method)=>sum+method.mock.calls.length,0);
+ it("reduz de 22 consultas Prisma para 4 no estoque sem carregar finanças, compras ou equipe", async () => {
+  await workspaceQuery(owner,from,to);
+  expect(countCalls()).toBe(22);
+  vi.clearAllMocks();
+  const data=await getWorkspaceData(owner,{},false,undefined,['estoque']);
+  expect(countCalls()).toBe(4);
+  expect(database.product.findMany).toHaveBeenCalled();
+  expect(database.productCategory.findMany).toHaveBeenCalled();
+  expect(database.supplier.findMany).not.toHaveBeenCalled();
+  expect(database.financialEntry.groupBy).not.toHaveBeenCalled();
+  expect(data.orders).toEqual([]);
+ });
+ it.each([
+  [['estoque','movimentacoes'],5],
+  [['estoque','inventarios'],5],
+  [['compras','necessidades'],3],
+  [['compras','listas'],5],
+  [['compras','cotacoes'],5],
+  [['compras','pedidos'],3],
+  [['financeiro'],7],
+  [['financeiro','contas-pagar'],6],
+  [['financeiro','categorias'],5],
+  [['relatorios'],7],
+  [['configuracoes'],4],
+ ] as const)("consulta apenas os conjuntos usados em %j", async (parts,expected) => {
+  await getWorkspaceData(owner,{},parts[1]==='contas-pagar',undefined,parts);
+  expect(countCalls()).toBe(expected);
+  expect(database.organization.findUniqueOrThrow).toHaveBeenCalledWith({where:{id:owner.organizationId},select:{id:true,name:true}});
+  if(parts[0]==='configuracoes') {
+   expect(database.user.findMany).toHaveBeenCalled();
+   expect(database.product.findMany).not.toHaveBeenCalled();
+   expect(database.financialEntry.findMany).not.toHaveBeenCalled();
+  }
+ });
+ it("mantém a busca direta de pedido antigo quando a página é limitada ao módulo de compras",async()=>{
+  await getWorkspaceData(owner,{},false,{kind:'order',id:'pedido-antigo'},['compras','pedidos','pedido-antigo']);
+  expect(database.purchaseOrder.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{organizationId:owner.organizationId,id:'pedido-antigo'},take:undefined}));
+  expect(countCalls()).toBe(3);
+ });
+ it("a otimização não libera dados financeiros para o comprador",async()=>{
+  const data=await getWorkspaceData({...owner,role:'BUYER'},{},false,undefined,['relatorios']);
+  expect(data.financeVisible).toBe(false);
+  expect(database.financialEntry.groupBy).not.toHaveBeenCalled();
+  expect(database.goodsReceipt.aggregate).not.toHaveBeenCalled();
+  expect(database.stockMovement.groupBy).toHaveBeenCalled();
+ });
+});

@@ -62,3 +62,36 @@ test("família completa o fluxo pela interface",async({page},testInfo)=>{
  await page.screenshot({path:`test-results/dashboard-${testInfo.project.name}.png`,fullPage:true,scale:"css"});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
 });
+
+test("troca páginas e abas mantendo a estrutura da aplicação",async({page},testInfo)=>{
+ const mobile=testInfo.project.name==='celular',suffix=Date.now().toString();
+ await page.goto('/cadastro');
+ await page.getByLabel('Nome do restaurante').fill('Teste de navegação '+suffix);
+ await page.getByLabel('Seu nome').fill('Responsável navegação');
+ await page.getByLabel('E-mail',{exact:true}).fill('navigation-'+suffix+'@example.test');
+ await page.getByLabel('Senha',{exact:true}).fill('TesteUI@123456');
+ await page.getByRole('button',{name:'Criar restaurante',exact:true}).click();
+ await expect(page).toHaveURL(/dashboard/);
+ await page.locator('.topbar').evaluate(el=>el.setAttribute('data-navigation-probe','preserved'));
+ for(const [name,url] of [['Estoque','/estoque'],['Financeiro','/financeiro'],['Configurações','/configuracoes']] as const){
+  if(mobile)await page.getByRole('button',{name:'Abrir menu',exact:true}).click();
+  const menu=page.locator(mobile?'.mobile-navigation':'.desktop-sidebar');
+  await menu.getByRole('link',{name,exact:true}).click();
+  await expect(page).toHaveURL(new RegExp(url+'$'));
+  await expect(page.locator('main').getByRole('heading',{name,exact:true})).toBeVisible();
+  await expect(page.locator('.topbar')).toHaveAttribute('data-navigation-probe','preserved');
+  if(name==='Estoque'){
+   await page.getByRole('navigation',{name:'Estoque',exact:true}).getByRole('link',{name:'Movimentações',exact:true}).click();
+   await expect(page.getByRole('heading',{name:'Histórico de estoque',exact:true})).toBeVisible();
+   await page.getByRole('navigation',{name:'Estoque',exact:true}).getByRole('link',{name:'Inventários',exact:true}).click();
+   await expect(page.getByRole('button',{name:'Iniciar inventário',exact:true})).toBeVisible();
+  }
+  if(name==='Financeiro'){
+   await page.getByRole('navigation',{name:'Financeiro',exact:true}).getByRole('link',{name:'Categorias',exact:true}).click();
+   await expect(page.getByRole('heading',{name:'Categorias financeiras',exact:true})).toBeVisible();
+   await page.getByRole('navigation',{name:'Financeiro',exact:true}).getByRole('link',{name:'Contas a pagar',exact:true}).click();
+   await expect(page.getByRole('heading',{name:'Todas as contas a pagar',exact:true})).toBeVisible();
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ }
+});
